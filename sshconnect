@@ -1,0 +1,39 @@
+#!/bin/bash
+
+#config json
+JSON_PATH=$(dirname $0)/json/hosts.json
+
+#if hosts.json file doesn't found - throw error
+if [[ ! -f "$JSON_PATH" ]]
+then
+    echo "error: config file hosts.json doesn't exist"
+    exit
+fi
+
+COUNT=$(cat $JSON_PATH | jq '.hosts | length')
+
+#if host count greatest or equal than 1 - check
+if [ $COUNT -ge 1 ]
+then
+    #if needed hostname doesn't found - throw error
+    FOUND_CONNECTION=false
+    for (( i=0; i < $COUNT; i++ ))
+    do
+        if [ $(cat $JSON_PATH | jq --raw-output ".hosts[$i].name") = $1 ]
+        then
+            #if json have needed hostname - get connection parameters and init expect script (expect_connection)
+            USER=$(cat $JSON_PATH | jq --raw-output ".hosts[$i].user")
+            HOST=$(cat $JSON_PATH | jq --raw-output ".hosts[$i].host")
+            PORT=$(cat $JSON_PATH | jq --raw-output ".hosts[$i].port")
+            PASSWORD=$(cat $JSON_PATH | jq --raw-output ".hosts[$i].password")
+            FOUND_CONNECTION=true
+            $(dirname $0)/expect_connection $USER $HOST $PORT $PASSWORD
+        fi
+    done
+    if [ "$FOUND_CONNECTION" = false ]
+    then
+        echo "error: searched hostname not found"
+    fi
+else
+    echo "error: hosts is empty. Fill them and run script again"
+fi

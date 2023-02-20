@@ -1,0 +1,15 @@
+#!/usr/bin/expect -f
+
+set timeout 1
+
+#Connection data
+set USER [lindex $argv 0]
+set HOST [lindex $argv 1]
+set PORT [lindex $argv 2]
+set PASSWD [lindex $argv 3]
+
+spawn ssh $USER@$HOST -p $PORT
+expect "*(yes/no)?*" {send "yes\r"}
+expect "Password:*"
+send "$PASSWD\r"
+interact

@@ -1,0 +1,12 @@
+{
+    "hosts":
+        [
+            {
+                "name": "test",
+                "user": "root",
+                "host": "123.123.123.123",
+                "port": "22",
+                "password": "qwerty123"
+            }
+        ]
+}
